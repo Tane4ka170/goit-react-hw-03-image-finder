@@ -33,9 +33,8 @@ class App extends Component {
       .then(response => {
         this.setState(prevState => ({
           images: [...prevState.images, ...response.data.hits],
-          page: prevState.page + 1,
           isLoading: false,
-          totalResults: response.data.totalHits, // Update the totalResults property
+          totalResults: response.data.totalHits,
         }));
       })
       .catch(error => {
@@ -52,9 +51,11 @@ class App extends Component {
     });
   };
 
-  handleLoadMore = () => {
-    this.fetchImages();
-  };
+handleLoadMore = () => {
+  this.setState(prevState => ({
+    page: prevState.page + 1,
+  }), this.fetchImages);
+};
 
   handleImageClick = largeImageURL => {
     this.setState(prev => ({ showModal: !prev.showModal, largeImageURL }));
@@ -65,8 +66,7 @@ class App extends Component {
   };
 
   render() {
-    const { images, isLoading, showModal, largeImageURL, totalResults } =
-      this.state;
+    const { images, isLoading, showModal, largeImageURL, totalResults } = this.state;
 
     return (
       <div>
