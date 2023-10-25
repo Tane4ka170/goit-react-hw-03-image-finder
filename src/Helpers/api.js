@@ -14,4 +14,6 @@ fetchImages.propTypes = {
   page: PropTypes.number.isRequired,
 };
 
-export default { fetchImages };
+const api = { fetchImages };
+
+export default api;
