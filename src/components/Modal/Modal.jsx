@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import s from './Modal.module.css';
 
 class Modal extends Component {
@@ -11,15 +12,11 @@ class Modal extends Component {
   }
 
   handleKeyDown = e => {
-    if (e.code === 'Escape') {
-      this.props.onClose();
-    }
+    e.code === 'Escape' && this.props.onClose();
   };
 
   handleClose = e => {
-    if (e.target === e.currentTarget) {
-      this.props.onClose();
-    }
+    e.target === e.currentTarget && this.props.onClose();
   };
 
   render() {
@@ -33,5 +30,10 @@ class Modal extends Component {
     );
   }
 }
+
+Modal.propTypes = {
+  largeImageURL: PropTypes.string.isRequired,
+  onClose: PropTypes.func.isRequired,
+};
 
 export default Modal;

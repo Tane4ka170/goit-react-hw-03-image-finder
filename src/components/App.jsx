@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import ImageGalleryItem from './ImageGalleryItem/ImageGalleryItem';
 import Button from './Button/Button';
 import Modal from './Modal/Modal';
 import Spinner from './Loader/Loader';
-
-const API_KEY = '39757407-13e7f5de39700ed4a356d5fcb';
+import api from '../Helpers/api';
 
 class App extends Component {
   state = {
@@ -17,6 +15,7 @@ class App extends Component {
     isLoading: false,
     showModal: false,
     largeImageURL: '',
+    totalResults: 0,
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -29,15 +28,14 @@ class App extends Component {
     const { query, page } = this.state;
     this.setState({ isLoading: true });
 
-    axios
-      .get(
-        `https://pixabay.com/api/?q=${query}&page=${page}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
-      )
+    api
+      .fetchImages(query, page)
       .then(response => {
         this.setState(prevState => ({
           images: [...prevState.images, ...response.data.hits],
           page: prevState.page + 1,
           isLoading: false,
+          totalResults: response.data.totalHits, // Update the totalResults property
         }));
       })
       .catch(error => {
@@ -59,7 +57,7 @@ class App extends Component {
   };
 
   handleImageClick = largeImageURL => {
-    this.setState({ showModal: true, largeImageURL });
+    this.setState(prev => ({ showModal: !prev.showModal, largeImageURL }));
   };
 
   handleCloseModal = () => {
@@ -67,7 +65,8 @@ class App extends Component {
   };
 
   render() {
-    const { images, isLoading, showModal, largeImageURL } = this.state;
+    const { images, isLoading, showModal, largeImageURL, totalResults } =
+      this.state;
 
     return (
       <div>
@@ -78,12 +77,12 @@ class App extends Component {
               key={image.id}
               webformatURL={image.webformatURL}
               largeImageURL={image.largeImageURL}
-              onClick={() => this.handleImageClick(image.largeImageURL)}
+              onImageClick={this.handleImageClick}
             />
           ))}
         </ImageGallery>
         {isLoading && <Spinner />}
-        {images.length > 0 && !isLoading && (
+        {images.length > 0 && images.length < totalResults && !isLoading && (
           <Button onClick={this.handleLoadMore} />
         )}
         {showModal && (
